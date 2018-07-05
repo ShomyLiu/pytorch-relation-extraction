@@ -14,8 +14,7 @@
 
 首先简单介绍目录：
 
->.
-
+```
 ├── checkpoints         # 保存预加载模型
 
 ├── config.py             # 参数
@@ -26,13 +25,13 @@
 
 │ ├── NYT                 # LARGE 数据
 
-│ ├── filternyt.py       
+│ ├── filternyt.py
 
 │ ├── __init__.py
 
 │ ├── nyt.py
 
-├── main_mil.py       # PCNN+ONE 主文件  
+├── main_mil.py       # PCNN+ONE 主文件
 
 ├── main_att.py        # PCNN+ATT 主文件
 
@@ -46,11 +45,12 @@
 
 │ ├── PCNN_ONE.py
 
-├── plot.ipynb           
+├── plot.ipynb
 
 ├── README.md
 
 ├── utils.py                # 工具函数
+```
 
 
 
@@ -64,7 +64,7 @@
 
 python main_mil.py train --data="NYT"  --batch_size=128
 
-``` 
+```
 
 注：需要提前按照下一节处理下数据（主要是生成npy格式的数据，方便直接被模型导入).
 
@@ -72,7 +72,7 @@ python main_mil.py train --data="NYT"  --batch_size=128
 
 ## 数据预处理
 
-为了节省空间， 上传了LARGE和SMALL两份的原生数据，因此需要用数据预处理下，从而生成npy格式数据。 
+为了节省空间， 上传了LARGE和SMALL两份的原生数据，因此需要用数据预处理下，从而生成npy格式数据。
 
 首先下载两份原始数据，地址:
 
@@ -116,7 +116,7 @@ python main_mil.py train --data="NYT"  --batch_size=128
 
 - Zeng 2015的theano代码中，关于select instance 和predict的地方，有些错误（并没有取概率最大的instance)
 
-- BatchSize相对大一些效果要好（128） 
+- BatchSize相对大一些效果要好（128）
 
 
 
