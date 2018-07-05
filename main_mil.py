@@ -38,7 +38,7 @@ def train(**kwargs):
         #  model = nn.DataParallel(model)
 
     # loading data
-    DataModel = getattr(dataset, 'FilterNYTData')
+    DataModel = getattr(dataset, opt.data + 'Data')
     train_data = DataModel(opt.data_root, train=True)
     train_data_loader = DataLoader(train_data, opt.batch_size, shuffle=True, num_workers=opt.num_workers, collate_fn=collate_fn)
 
