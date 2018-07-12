@@ -19,43 +19,26 @@
 - Pytorch 0.3.1
 - fire
 
-简单介绍目录：
+简单介绍主要目录：
 
 ```
 ├── checkpoints         # 保存预加载模型
-
 ├── config.py             # 参数
-
 ├── dataset                # 数据目录
-
 │ ├── FilterNYT         # SMALL 数据
-
 │ ├── NYT                 # LARGE 数据
-
 │ ├── filternyt.py
-
 │ ├── __init__.py
-
 │ ├── nyt.py
-
 ├── main_mil.py       # PCNN+ONE 主文件
-
 ├── main_att.py        # PCNN+ATT 主文件
-
 ├── models               # 模型目录
-
 │ ├── BasicModule.py
-
 │ ├── __init__.py
-
 │ ├── PCNN_ATT.py
-
 │ ├── PCNN_ONE.py
-
 ├── plot.ipynb
-
 ├── README.md
-
 ├── utils.py                # 工具函数
 ```
 
@@ -136,3 +119,4 @@ python main_mil.py train --data="NYT"  --batch_size=128
 - [PCNN+ONE Zeng 2015](https://github.com/smilelhh/ds_pcnns)
 - [PCNN+ATT Lin 2016](https://github.com/thunlp/NRE)
 - [RE-DS-Word-Attention-Models](https://github.com/SharmisthaJat/RE-DS-Word-Attention-Models)
+- [GloRE](https://github.com/ppuliu/GloRE)
