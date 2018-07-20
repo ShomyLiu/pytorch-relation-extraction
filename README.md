@@ -68,6 +68,10 @@ python main_mil.py train --data="NYT"  --batch_size=128
 
 [百度网盘](https://pan.baidu.com/s/1MyCFWzy89OkBoxfrdHwSfg)  [谷歌云盘](https://drive.google.com/drive/folders/1kqHG0KszGhkyLA4AZSLZ2XZm9sxD8b58?usp=sharing)
 
+数据格式简单说明:
+- 第一行: 两个实体ID:  ent1id ent2id
+- 第二行: bag标签和bag内句子个数，其中由于少数bag有多个label(不会超过4个)，因此句子label用4个整数表示，-1表示为空，如: 2 4 -1 -1 3 表示该bag的标签为2和4，然后包含3个句子
+- 后续几行表示该bag内的句子
 
 
 将两个zip放到`dataset`目录下，解压，这样会形成两个目录 ，一个NYT, 一个FilterNYT, 其中LARGE数据集在NYT目录，SMALL数据在FilterNYT内，这里的原始数据分别是从Zeng 2015 以及 Lin2016 的开源代码中获得。
