@@ -1,8 +1,12 @@
-使用Pytorch 复现 PCNN+MIL (Zeng 2015) 与 PCNN+ATT (Lin 2016), 以及两个模型在两个大小版本的数据集上的表现对比。
+使用Pytorch 复现 PCNN+MIL (Zeng 2015) 与 PCNN+ATT (Lin 2016), 以及两个模型在两个大小版本的数据集上(27类关系/53类关系)的表现对比。
 
 
 
-结果见博客:[relatoin-extraction](http://shomy.top/2018/07/05/pytorch-relation-extraction/).
+相关博客:
+
+- [关系抽取论文笔记](http://shomy.top/2018/02/28/relation-extraction/)
+
+- [复现结果说明](http://shomy.top/2018/07/05/pytorch-relation-extraction/)
 
 
 
@@ -84,7 +88,7 @@ python main_mil.py train --data="NYT"  --batch_size=128
 
 - 切换到NYT目录下，
 
-- 编译执行extract_cpp目录的extract.cpp: `g++  extract.cpp -o extract`, 得到`bag_train.txt, bag_test.txt` (在NYT目录内)，该cpp是Lin2016预处理的代码
+- 编译执行extract_cpp目录的extract.cpp: `g++  extract.cpp -o extract`, 之后执行:`./extract`, 得到`bag_train.txt, bag_test.txt` (在NYT目录内)，该cpp是Lin2016预处理的代码
 
 - 切换回主目录：执行数据预处理: `python dataset/nyt.py` 这样就会在NYT目录下生成一系列的npy文件。
 
