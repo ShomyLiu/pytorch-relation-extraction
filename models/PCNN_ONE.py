@@ -71,9 +71,20 @@ class PCNN_ONE(BasicModule):
             self.pos2_embs.weight.data.copy_(p2_2v)
             self.word_embs.weight.data.copy_(w2v)
 
+    def mask_piece_pooling(self, x, mask):
+        '''
+        refer: https://github.com/thunlp/OpenNRE
+        A fast piecewise pooling using mask
+        '''
+        x = x.unsqueeze(-1).permute(0, 2, 1, -1)
+        masks = self.mask_embedding(mask).unsqueeze(-2) * 100
+        x = masks + x
+        x = torch.max(x, 1)[0] - 100
+        return x.view(-1, x.size(1) * x.size(2))
+
     def piece_max_pooling(self, x, insPool):
         '''
-        simple version piecewise
+        old version piecewise
         '''
         split_batch_x = torch.split(x, 1, 0)
         split_pool = torch.split(insPool, 1, 0)
