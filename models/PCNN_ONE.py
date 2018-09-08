@@ -31,6 +31,11 @@ class PCNN_ONE(BasicModule):
 
         if self.opt.use_pcnn:
             all_filter_num = all_filter_num * 3
+            masks = torch.LongTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
+            if self.opt.use_gpu:
+                masks = masks.cuda()
+            self.mask_embedding = nn.Embedding(4, 3)
+            self.mask_embedding.weight.data.copy_(masks)
 
         self.linear = nn.Linear(all_filter_num, self.opt.rel_num)
         self.dropout = nn.Dropout(self.opt.drop_out)
@@ -76,7 +81,7 @@ class PCNN_ONE(BasicModule):
         refer: https://github.com/thunlp/OpenNRE
         A fast piecewise pooling using mask
         '''
-        x = x.unsqueeze(-1).permute(0, 2, 1, -1)
+        x = x.unsqueeze(-1).permute(0, 2, 1, 3)
         masks = self.mask_embedding(mask).unsqueeze(-2) * 100
         x = masks + x
         x = torch.max(x, 1)[0] - 100
@@ -89,7 +94,6 @@ class PCNN_ONE(BasicModule):
         split_batch_x = torch.split(x, 1, 0)
         split_pool = torch.split(insPool, 1, 0)
         batch_res = []
-
         for i in range(len(split_pool)):
             ins = split_batch_x[i].squeeze()  # all_filter_num * max_len
             pool = split_pool[i].squeeze().data    # 2
@@ -104,7 +108,8 @@ class PCNN_ONE(BasicModule):
         return out
 
     def forward(self, x):
-        insEnt, _, insX, insPFs, insPool = x
+
+        insEnt, _, insX, insPFs, insPool, insMasks = x
         insPF1, insPF2 = [i.squeeze(1) for i in torch.split(insPFs, 1, 1)]
 
         word_emb = self.word_embs(insX)
@@ -118,7 +123,8 @@ class PCNN_ONE(BasicModule):
         x = [F.tanh(conv(x)).squeeze(3) for conv in self.convs]
 
         if self.opt.use_pcnn:
-            x = [self.piece_max_pooling(i, insPool) for i in x]
+            x = [self.mask_piece_pooling(i, insMasks) for i in x]
+            # x = [self.piece_max_pooling(i, insPool) for i in x]
         else:
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x]
 

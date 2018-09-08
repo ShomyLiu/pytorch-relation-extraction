@@ -34,6 +34,7 @@ def train(**kwargs):
     if opt.use_gpu:
         # torch.cuda.manual_seed_all(opt.seed)
         model.cuda()
+        # parallel
         #  model = nn.DataParallel(model)
 
     # loading data
@@ -101,6 +102,7 @@ def select_instance(model, batch_data, labels):
     select_sen = []
     select_pf = []
     select_pool = []
+    select_mask = []
     for idx, bag in enumerate(batch_data):
         insNum = bag[1]
         label = labels[idx]
@@ -125,17 +127,19 @@ def select_instance(model, batch_data, labels):
         max_sen = bag[2][max_ins_id]
         max_pf = bag[3][max_ins_id]
         max_pool = bag[4][max_ins_id]
+        max_mask = bag[5][max_ins_id]
 
         select_ent.append(bag[0])
         select_num.append(bag[1])
         select_sen.append(max_sen)
         select_pf.append(max_pf)
         select_pool.append(max_pool)
+        select_mask.append(max_mask)
 
     if opt.use_gpu:
-        data = map(lambda x: Variable(torch.LongTensor(x).cuda()), [select_ent, select_num, select_sen, select_pf, select_pool])
+        data = map(lambda x: Variable(torch.LongTensor(x).cuda()), [select_ent, select_num, select_sen, select_pf, select_pool, select_mask])
     else:
-        data = map(lambda x: Variable(torch.LongTensor(x)), [select_ent, select_num, select_sen, select_pf, select_pool])
+        data = map(lambda x: Variable(torch.LongTensor(x)), [select_ent, select_num, select_sen, select_pf, select_pool, select_mask])
 
     model.train()
     return data

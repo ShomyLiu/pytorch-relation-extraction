@@ -125,6 +125,7 @@ class NYTLoad(object):
             sentences = []
             entitiesPos = []
             pos = []
+            masks = []
             rels = []
 
             for i in range(num):
@@ -143,15 +144,17 @@ class NYTLoad(object):
                 sentences.append(map(lambda x: int(x) + 1, sent))
                 ldist = f.readline().strip().split(',')
                 rdist = f.readline().strip().split(',')
+                mask = f.readline().strip().split(",")
                 ldists.append(map(int, ldist))
                 rdists.append(map(int, rdist))
+                masks.append(list(map(int, mask)))
 
             rels = list(set(rels))
             if len(rels) < 4:
                 rels.extend([-1] * (4 - len(rels)))
             else:
                 rels = rels[:4]
-            bag = [entities, num, sentences, ldists, rdists, pos, entitiesPos]
+            bag = [entities, num, sentences, ldists, rdists, pos, entitiesPos, masks]
 
             all_labels.append(rels)
             all_sens += [bag]
@@ -173,27 +176,30 @@ class NYTLoad(object):
         update_bags = []
 
         for bag in bags:
-            es, num, sens, ldists, rdists, pos, enPos = bag
+            es, num, sens, ldists, rdists, pos, enPos, masks = bag
             new_sen = []
             new_pos = []
             new_entPos = []
+            new_masks= []
 
             for idx, sen in enumerate(sens):
-                sen, pf1, pf2, pos = self.get_pad_sen_pos(sen, ldists[idx], rdists[idx], enPos[idx])
+                sen, pf1, pf2, pos, mask = self.get_pad_sen_pos(sen, ldists[idx], rdists[idx], enPos[idx], masks[idx])
                 new_sen.append(sen)
                 new_pos.append([pf1, pf2])
                 new_entPos.append(pos)
-            update_bags.append([es, num, new_sen, new_pos, new_entPos])
+                new_masks.append(mask)
+            update_bags.append([es, num, new_sen, new_pos, new_entPos, new_masks])
 
         return update_bags
 
-    def get_pad_sen_pos(self, sen, ldist, rdist, pos):
+    def get_pad_sen_pos(self, sen, ldist, rdist, pos, mask):
         '''
         refer: github.com/SharmisthaJat/RE-DS-Word-Attention-Models
         '''
-        x = [0]
-        pf1 = [0]
-        pf2 = [0]
+        x = []
+        pf1 = []
+        pf2 = []
+        masks = []
 
         # shorter than max_len
         if len(sen) <= self.max_len:
@@ -201,6 +207,7 @@ class NYTLoad(object):
                 x.append(ind)
                 pf1.append(ldist[i] + 1)
                 pf2.append(rdist[i] + 1)
+                masks.append(mask[i])
         # longer than max_len, expand between two entities
         else:
             idx = [i for i in range(pos[0], pos[1] + 1)]
@@ -210,6 +217,7 @@ class NYTLoad(object):
                     x.append(sen[i])
                     pf1.append(ldist[i] + 1)
                     pf2.append(rdist[i] + 1)
+                    masks.append(mask[i])
                 pos[0] = 1
                 pos[1] = len(idx) - 1
             else:
@@ -217,6 +225,7 @@ class NYTLoad(object):
                     x.append(sen[i])
                     pf1.append(ldist[i] + 1)
                     pf2.append(rdist[i] + 1)
+                    masks.append(mask[i])
 
                 before = pos[0] - 1
                 after = pos[1] + 1
@@ -229,6 +238,7 @@ class NYTLoad(object):
                         x.append(sen[before])
                         pf1.append(ldist[before] + 1)
                         pf2.append(rdist[before] + 1)
+                        masks.append(mask[before])
                         added = 1
                         numAdded += 1
 
@@ -236,6 +246,7 @@ class NYTLoad(object):
                         x.append(sen[after])
                         pf1.append(ldist[after] + 1)
                         pf2.append(rdist[after] + 1)
+                        masks.append(mask[after])
                         added = 1
 
                     if added == 0:
@@ -251,6 +262,7 @@ class NYTLoad(object):
             x.append(0)
             pf1.append(0)
             pf2.append(0)
+            masks.append(0)
 
         if pos[0] == pos[1]:
             if pos[1] + 1 < len(sen):
@@ -261,7 +273,7 @@ class NYTLoad(object):
                 else:
                     raise Exception('pos= {},{}'.format(pos[0], pos[1]))
 
-        return [x, pf1, pf2, pos]
+        return [x, pf1, pf2, pos, masks]
 
     def get_pad_sen(self, sen):
         '''
