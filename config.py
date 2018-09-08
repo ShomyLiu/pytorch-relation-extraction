@@ -23,7 +23,7 @@ data_dic ={
 class DefaultConfig(object):
 
     model = 'PCNN_ONE'  # the name of used model, in  <models/__init__.py>
-    data = 'FilterNYT'  # SEM NYT FilterNYT
+    data = 'NYT'  # SEM NYT FilterNYT
 
     result_dir = './out/'
     data_root = data_dic[data]['data_root']  # the data dir
@@ -36,7 +36,7 @@ class DefaultConfig(object):
     batch_size = 128  # batch size
     use_gpu = True  # user GPU or not
     gpu_id = 0
-    num_workers = 2  # how many workers for loading data
+    num_workers = 0  # how many workers for loading data
 
     max_len = 80 + 2  # max_len for each sentence + two padding
     limit = 50  # the position range <-limit, limit>
