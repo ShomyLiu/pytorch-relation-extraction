@@ -25,7 +25,16 @@ class PCNN_ATT(BasicModule):
 
         all_filter_num = self.opt.filters_num * len(self.opt.filters)
 
-        rel_dim = all_filter_num * 3
+        rel_dim = all_filter_num
+
+        if self.opt.use_pcnn:
+            rel_dim = all_filter_num * 3
+            masks = torch.LongTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
+            if self.opt.use_gpu:
+                masks = masks.cuda()
+            self.mask_embedding = nn.Embedding(4, 3)
+            self.mask_embedding.weight.data.copy_(masks)
+
         self.rel_embs = nn.Parameter(torch.randn(self.opt.rel_num, rel_dim))
         self.rel_bias = nn.Parameter(torch.randn(self.opt.rel_num))
 
@@ -83,6 +92,17 @@ class PCNN_ATT(BasicModule):
             return Variable(torch.LongTensor([num]).cuda())
         else:
             return Variable(torch.LongTensor([num]))
+
+    def mask_piece_pooling(self, x, mask):
+        '''
+        refer: https://github.com/thunlp/OpenNRE
+        A fast piecewise pooling using mask
+        '''
+        x = x.unsqueeze(-1).permute(0, 2, 1, 3)
+        masks = self.mask_embedding(mask).unsqueeze(-2) * 100
+        x = masks + x
+        x = torch.max(x, 1)[0] - 100
+        return x.view(-1, x.size(1) * x.size(2))
 
     def piece_max_pooling(self, x, insPool):
         '''
@@ -189,7 +209,7 @@ class PCNN_ATT(BasicModule):
         '''
         x: all instance in a Bag
         '''
-        insEnt, _, insX, insPFs, insPool = x
+        insEnt, _, insX, insPFs, insPool, mask = x
         insPF1, insPF2 = [i.squeeze(1) for i in torch.split(insPFs, 1, 1)]
 
         word_emb = self.word_embs(insX)
@@ -199,6 +219,7 @@ class PCNN_ATT(BasicModule):
         x = torch.cat([word_emb, pf1_emb, pf2_emb], 2)                          # insNum * 1 * maxLen * (word_dim + 2pos_dim)
         x = x.unsqueeze(1)                                                      # insNum * 1 * maxLen * (word_dim + 2pos_dim)
         x = [F.tanh(conv(x)).squeeze(3) for conv in self.convs]
-        x = [self.piece_max_pooling(i, insPool) for i in x]
+        x = [self.mask_piece_pooling(i, mask) for i in x]
+        # x = [self.piece_max_pooling(i, insPool) for i in x]
         x = torch.cat(x, 1)
         return x

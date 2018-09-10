@@ -70,7 +70,7 @@ def train(**kwargs):
             # if idx % 100 == 99:
                 # print('{}: Train iter: {} finish'.format(now(), idx))
 
-        if epoch > -2:
+        if epoch > 2:
             # true_y, pred_y, pred_p= predict(model, test_data_loader)
             # all_pre, all_rec = eval_metric(true_y, pred_y, pred_p)
             pred_res, p_num = predict_var(model, test_data_loader)
