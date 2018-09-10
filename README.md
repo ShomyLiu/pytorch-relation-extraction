@@ -1,7 +1,7 @@
 
 2018.9.10 更新:
 - 参考OpenNRE使用mask可以快速计算piece wise pooling.
-    - 修改NYT 53类数据处理 (完成): 将NYT目录下的extract.cpp 替换原始数据的extract.cpp
+    - 修改NYT 53类数据处理 (完成): 将dataset目录下的extract.cpp 替换原始数据extract_cpp目录下的extract.cpp
     - 修改NYT 27类数据处理 (未完成)
     
 
