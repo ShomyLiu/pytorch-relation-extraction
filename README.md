@@ -132,6 +132,6 @@ python main_mil.py train --data="NYT"  --batch_size=128
 ## 参考
 
 - [PCNN+ONE Zeng 2015](https://github.com/smilelhh/ds_pcnns)
-- [PCNN+ATT Lin 2016](https://github.com/thunlp/NRE)
+- [PCNN+ATT Lin 2016](https://github.com/thunlp/OpenNRE)
 - [RE-DS-Word-Attention-Models](https://github.com/SharmisthaJat/RE-DS-Word-Attention-Models)
 - [GloRE](https://github.com/ppuliu/GloRE)
