@@ -1,9 +1,10 @@
 
 2018.9.10 更新:
 - 参考OpenNRE使用mask可以快速计算piece wise pooling.
-    - 修改NYT 53类数据处理 (完成): 将dataset目录下的extract.cpp 替换原始数据extract_cpp目录下的extract.cpp
+    - 修改NYT 53类数据处理 (完成)
     - 修改NYT 27类数据处理 (未完成)
     
+数据处理需要已经修改
 
 使用Pytorch 复现 PCNN+MIL (Zeng 2015) 与 PCNN+ATT (Lin 2016), 以及两个模型在两个大小版本的数据集上(27类关系/53类关系)的表现对比。
 
@@ -77,7 +78,7 @@ python main_mil.py train --data="NYT"  --batch_size=128
 
 首先下载两份原始数据，地址:
 
-[百度网盘](https://pan.baidu.com/s/1MyCFWzy89OkBoxfrdHwSfg)  [谷歌云盘](https://drive.google.com/drive/folders/1kqHG0KszGhkyLA4AZSLZ2XZm9sxD8b58?usp=sharing)
+[百度网盘](https://pan.baidu.com/s/1Mu46NOtrrJhqN68s9WfLKg)  [谷歌云盘](https://drive.google.com/drive/folders/1kqHG0KszGhkyLA4AZSLZ2XZm9sxD8b58?usp=sharing)
 
 数据格式简单说明:
 - 第一行: 两个实体ID:  ent1id ent2id
@@ -95,7 +96,7 @@ python main_mil.py train --data="NYT"  --batch_size=128
 
 - 切换到NYT目录下，
 
-- 编译执行extract_cpp目录的extract.cpp: `g++  extract.cpp -o extract`, 之后执行:`./extract`, 得到`bag_train.txt, bag_test.txt` (在NYT目录内)，该cpp是Lin2016预处理的代码
+- 编译执行extract_cpp目录的extract.cpp: `g++  extract.cpp -o extract`, 之后执行:`./extract`, 得到`bag_train.txt, bag_test.txt, vector.txt` (在NYT目录内)，该cpp是Lin2016预处理的代码
 
 - 切换回主目录：执行数据预处理: `python dataset/nyt.py` 这样就会在NYT目录下生成一系列的npy文件。
 
