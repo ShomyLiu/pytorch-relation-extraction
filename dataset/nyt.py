@@ -80,21 +80,19 @@ class NYTLoad(object):
         '''
         wordlist = []
 
-        wordlist.append('BLANK')
         f = file(self.w2v_path)
-        dim = int(f.readline().split()[1])
-        vecs = [np.zeros(dim)]
+        # dim = int(f.readline().split()[1])
+        # f = f.readlines()
 
-        f = f.readlines()
+        vecs = []
         for line in f:
             line = line.strip('\n').split()
-            vec = map(float, line[1:])
+            vec = map(float, line[1].split(',')[:-1])
             vecs.append(vec)
             wordlist.append(line[0])
 
-        wordlist.append('UNK')
-
-        vecs.append(np.random.uniform(low=-0.5, high=0.5, size=dim))
+        #  wordlist.append('UNK')
+        #  vecs.append(np.random.uniform(low=-0.5, high=0.5, size=dim))
         word2id = {j: i for i, j in enumerate(wordlist)}
         id2word = {i: j for i, j in enumerate(wordlist)}
 
@@ -133,7 +131,7 @@ class NYTLoad(object):
                 #  entities = ent_pair_line[:2]
                 # ignore the entities index in vocab
                 entities = [0, 0]
-                epos = map(lambda x: int(x) + 1, ent_pair_line[2:4])
+                epos = map(lambda x: int(x), ent_pair_line[2:4])
                 pos.append(epos)
                 epos.sort()
                 entitiesPos.append(epos)
@@ -141,7 +139,7 @@ class NYTLoad(object):
                 rel = int(ent_pair_line[4])
                 rels.append(rel)
                 sent = f.readline().strip().split(',')
-                sentences.append(map(lambda x: int(x) + 1, sent))
+                sentences.append(map(lambda x: int(x), sent))
                 ldist = f.readline().strip().split(',')
                 rdist = f.readline().strip().split(',')
                 mask = f.readline().strip().split(",")

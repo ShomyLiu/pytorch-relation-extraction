@@ -86,7 +86,7 @@ void init() {
 	PositionMaxE2 = 0;
 	wordVec = (float *)malloc((wordTotal+1) * dimension * sizeof(float));
 	wordList.resize(wordTotal+1);
-	wordList[0] = "UNK";
+	wordList[0] = "BLANK";
 	for (int b = 1; b <= wordTotal; b++) {
 		string name = "";
 		while (1) {
@@ -110,7 +110,7 @@ void init() {
 	fclose(f);
 
 	ofstream fout;
-  	fout.open("word2vec.txt",ios::out);
+  	fout.open("../vector.txt",ios::out);
 	for (int i = 0; i < wordTotal; i++)
 	{
 		fout << wordList[i]<<"\t";

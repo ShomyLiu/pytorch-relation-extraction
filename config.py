@@ -6,7 +6,7 @@ data_dic ={
         'w2v_path': './dataset/NYT/w2v.npy',
         'p1_2v_path': './dataset/NYT/p1_2v.npy',
         'p2_2v_path': './dataset/NYT/p2_2v.npy',
-        'vocab_size': 114044,
+        'vocab_size': 114043,
         'rel_num': 53
     },
     'FilterNYT': {
