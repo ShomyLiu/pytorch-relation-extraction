@@ -29,11 +29,6 @@ class PCNN_ATT(BasicModule):
 
         if self.opt.use_pcnn:
             rel_dim = all_filter_num * 3
-            masks = torch.LongTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
-            if self.opt.use_gpu:
-                masks = masks.cuda()
-            self.mask_embedding = nn.Embedding(4, 3)
-            self.mask_embedding.weight.data.copy_(masks)
 
         self.rel_embs = nn.Parameter(torch.randn(self.opt.rel_num, rel_dim))
         self.rel_bias = nn.Parameter(torch.randn(self.opt.rel_num))
@@ -98,6 +93,12 @@ class PCNN_ATT(BasicModule):
         refer: https://github.com/thunlp/OpenNRE
         A fast piecewise pooling using mask
         '''
+        masks = torch.LongTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
+        if self.opt.use_gpu:
+            masks = masks.cuda()
+        self.mask_embedding = nn.Embedding(4, 3)
+        self.mask_embedding.weight.data.copy_(masks)
+
         x = x.unsqueeze(-1).permute(0, 2, 1, 3)
         masks = self.mask_embedding(mask).unsqueeze(-2) * 100
         x = masks + x
