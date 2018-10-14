@@ -1,4 +1,9 @@
 
+2018.10.14更新：
+
+全监督的关系抽取PCNN(Zeng 2014)的代码地址: [PCNN](https://github.com/ShomyLiu/pytorch-pcnn)
+
+
 2018.9.10 更新:
 - 参考OpenNRE使用mask可以快速计算piece wise pooling.
     - 修改NYT 53类数据处理 (完成)
