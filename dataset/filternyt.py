@@ -123,14 +123,19 @@ class FilterNYTLoad(object):
             positions = []
             sentences = []
             entitiesPos = []
+            masks = []
             for i in range(0, num):
                 sent = f.readline().split(' ')
                 positions.append(map(int, sent[0:2]))
                 epos = map(lambda x: int(x) + 1, sent[0:2])
                 epos.sort()
+                mask = [1] * (epos[0] + 1)
+                mask += [2] * (epos[1] - epos[0])
+                mask += [3] * (len(sent[2:-1]) - epos[1])
                 entitiesPos.append(epos)
                 sentences.append(map(int, sent[2:-1]))
-            bag = [entities, num, sentences, positions, entitiesPos]
+                masks.append(mask)
+            bag = [entities, num, sentences, positions, entitiesPos, masks]
             all_labels.append(rel)
             all_sens += [bag]
 
@@ -151,13 +156,16 @@ class FilterNYTLoad(object):
         update_bags = []
 
         for bag in bags:
-            es, num, sens, pos, enPos = bag
+            es, num, sens, pos, enPos, masks = bag
             new_sen = []
             new_pos = []
+            new_masks = []
             for idx, sen in enumerate(sens):
-                new_pos.append(self.get_pos_feature(len(sen), pos[idx]))
+                _pos, _mask = self.get_pos_feature(len(sen), pos[idx], masks[idx])
+                new_pos.append(_pos)
+                new_masks.append(_mask)
                 new_sen.append(self.get_pad_sen(sen))
-            update_bags.append([es, num, new_sen, new_pos, enPos])
+            update_bags.append([es, num, new_sen, new_pos, enPos, new_masks])
 
         return update_bags
 
@@ -165,7 +173,7 @@ class FilterNYTLoad(object):
         '''
         padding the sentences
         '''
-        sen.insert(0, self.word2id['BLANK'])
+        # sen.insert(0, self.word2id['BLANK'])
         if len(sen) < self.max_len + 2 * self.pad:
             sen += [self.word2id['BLANK']] * (self.max_len +2 * self.pad - len(sen))
         else:
@@ -173,7 +181,7 @@ class FilterNYTLoad(object):
 
         return sen
 
-    def get_pos_feature(self, sen_len, ent_pos):
+    def get_pos_feature(self, sen_len, ent_pos, mask):
         '''
         clip the postion range:
         : -limit ~ limit => 0 ~ limit * 2+2
@@ -195,15 +203,16 @@ class FilterNYTLoad(object):
         else:
             index = np.arange(self.max_len)
 
-        pf1 = [0]
-        pf2 = [0]
+        pf1 = []
+        pf2 = []
         pf1 += map(padding, index - ent_pos[0] + 2 + self.limit)
         pf2 += map(padding, index - ent_pos[1] + 2 + self.limit)
 
         if len(pf1) < self.max_len + 2 * self.pad:
             pf1 += [0] * (self.max_len + 2 * self.pad - len(pf1))
             pf2 += [0] * (self.max_len + 2 * self.pad - len(pf2))
-        return [pf1, pf2]
+            mask += [0] * (self.max_len + 2 * self.pad - len(mask))
+        return [pf1, pf2], mask
 
 
 if __name__ == "__main__":
