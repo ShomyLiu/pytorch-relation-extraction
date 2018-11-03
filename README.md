@@ -1,3 +1,10 @@
+2018.11.3:
+
+**基于mask的**`use_pcnn=True`目前有一些问题，正在修改, 建议:
+
+- 直接使用 `use_pcnn=False` 测试，性能差不太多
+- 使用mask修改之前的版本: https://github.com/ShomyLiu/pytorch-relation-extraction/tree/7e3ef1720d43690fc0da0d81e54bdc0fc0cf822a
+
 
 2018.10.14更新：
 
