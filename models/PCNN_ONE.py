@@ -76,14 +76,12 @@ class PCNN_ONE(BasicModule):
         refer: https://github.com/thunlp/OpenNRE
         A fast piecewise pooling using mask
         '''
-        masks = torch.LongTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
-        mask_embedding = nn.Embedding(4, 3)
+        mask_embedding = torch.LongTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
         if self.opt.use_gpu:
-            masks = masks.cuda()
-        mask_embedding.weight.data.copy_(masks)
+            mask_embedding = mask_embedding.cuda()
         x = x.unsqueeze(-1).permute(0, 2, 1, 3)
-        masks = mask_embedding(mask).unsqueeze(-2) * 100
-        x = masks + x
+        masks = mask_embedding[mask].unsqueeze(-2) * 100
+        x = masks.float() + x
         x = torch.max(x, 1)[0] - 100
         return x.view(-1, x.size(1) * x.size(2))
 
@@ -120,7 +118,7 @@ class PCNN_ONE(BasicModule):
         x = x.unsqueeze(1)
         x = self.dropout(x)
 
-        x = [F.tanh(conv(x)).squeeze(3) for conv in self.convs]
+        x = [conv(x).squeeze(3) for conv in self.convs]
 
         if self.opt.use_pcnn:
             x = [self.mask_piece_pooling(i, insMasks) for i in x]
@@ -128,7 +126,7 @@ class PCNN_ONE(BasicModule):
         else:
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x]
 
-        x = torch.cat(x, 1)
+        x = torch.cat(x, 1).tanh()
         x = self.dropout(x)
         x = self.linear(x)
 

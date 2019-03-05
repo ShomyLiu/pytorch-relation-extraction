@@ -93,15 +93,13 @@ class PCNN_ATT(BasicModule):
         refer: https://github.com/thunlp/OpenNRE
         A fast piecewise pooling using mask
         '''
-        masks = torch.LongTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
+        mask_embedding = torch.LongTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
         if self.opt.use_gpu:
-            masks = masks.cuda()
-        self.mask_embedding = nn.Embedding(4, 3)
-        self.mask_embedding.weight.data.copy_(masks)
+            mask_embedding = mask_embedding.cuda()
 
         x = x.unsqueeze(-1).permute(0, 2, 1, 3)
-        masks = self.mask_embedding(mask).unsqueeze(-2) * 100
-        x = masks + x
+        masks = mask_embedding[mask].unsqueeze(-2) * 100
+        x = masks .float() + x
         x = torch.max(x, 1)[0] - 100
         return x.view(-1, x.size(1) * x.size(2))
 
@@ -135,11 +133,11 @@ class PCNN_ATT(BasicModule):
 
         if label is None:
             # for test
-            assert self.training == False
+            assert self.training is False
             return self.test(x)
         else:
             # for train
-            assert self.training == True
+            assert self.training is True
             return self.fit(x, label)
 
     def fit(self, x, label):
@@ -219,8 +217,8 @@ class PCNN_ATT(BasicModule):
 
         x = torch.cat([word_emb, pf1_emb, pf2_emb], 2)                          # insNum * 1 * maxLen * (word_dim + 2pos_dim)
         x = x.unsqueeze(1)                                                      # insNum * 1 * maxLen * (word_dim + 2pos_dim)
-        x = [F.tanh(conv(x)).squeeze(3) for conv in self.convs]
+        x = [conv(x).squeeze(3) for conv in self.convs]
         x = [self.mask_piece_pooling(i, mask) for i in x]
         # x = [self.piece_max_pooling(i, insPool) for i in x]
-        x = torch.cat(x, 1)
+        x = torch.cat(x, 1).tanh()
         return x
