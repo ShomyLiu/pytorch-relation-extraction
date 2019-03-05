@@ -1,3 +1,8 @@
+2019.03.05:
+
+修复`mask piece wise`的bug.
+
+
 2018.11.3:
 
 **基于mask的**`use_pcnn=True`目前有一些问题，正在修改, 建议:
