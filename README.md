@@ -2,6 +2,8 @@
 
 修复`mask piece wise`的bug.
 
+- 更新至pytorch 0.4+, 0.3版本不兼容
+
 
 2018.11.3:
 
