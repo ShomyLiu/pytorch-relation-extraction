@@ -217,3 +217,4 @@ class FilterNYTLoad(object):
 
 if __name__ == "__main__":
     data = FilterNYTLoad('./dataset/FilterNYT/')
+

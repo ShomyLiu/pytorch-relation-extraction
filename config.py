@@ -25,7 +25,7 @@ class DefaultConfig(object):
     model = 'PCNN_ONE'  # the name of used model, in  <models/__init__.py>
     data = 'NYT'  # SEM NYT FilterNYT
 
-    result_dir = './out/'
+    result_dir = './out'
     data_root = data_dic[data]['data_root']  # the data dir
     w2v_path = data_dic[data]['w2v_path']
     p1_2v_path = data_dic[data]['p1_2v_path']
@@ -35,7 +35,7 @@ class DefaultConfig(object):
     seed = 3435
     batch_size = 128  # batch size
     use_gpu = True  # user GPU or not
-    gpu_id = 0
+    gpu_id = 1
     num_workers = 0  # how many workers for loading data
 
     max_len = 80 + 2  # max_len for each sentence + two padding
@@ -71,7 +71,7 @@ def parse(self, kwargs):
         '''
         user can update the default hyperparamter
         '''
-        for k, v in kwargs.iteritems():
+        for k, v in kwargs.items():
             if not hasattr(self, k):
                 raise Exception('opt has No key: {}'.format(k))
             setattr(self, k, v)
@@ -81,7 +81,7 @@ def parse(self, kwargs):
 
         print('*************************************************')
         print('user config:')
-        for k, v in self.__class__.__dict__.iteritems():
+        for k, v in self.__class__.__dict__.items():
             if not k.startswith('__'):
                 print("{} => {}".format(k, getattr(self, k)))
 
@@ -89,4 +89,4 @@ def parse(self, kwargs):
 
 
 DefaultConfig.parse = parse
-opt =DefaultConfig()
+opt = DefaultConfig()
