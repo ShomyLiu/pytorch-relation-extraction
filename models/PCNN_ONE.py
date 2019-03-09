@@ -124,8 +124,8 @@ class PCNN_ONE(BasicModule):
 
         x = [conv(x).squeeze(3) for conv in self.convs]
         if self.opt.use_pcnn:
-          #  x = [self.mask_piece_pooling(i, insMasks) for i in x]
-            x = [self.piece_max_pooling(i, insPool) for i in x]
+            x = [self.mask_piece_pooling(i, insMasks) for i in x]
+            # x = [self.piece_max_pooling(i, insPool) for i in x]
         else:
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x]
         x = torch.cat(x, 1).tanh()

@@ -135,11 +135,11 @@ class PCNN_ATT(BasicModule):
 
         if label is None:
             # for test
-            assert self.training == False
+            assert self.training is False
             return self.test(x)
         else:
             # for train
-            assert self.training == True
+            assert self.training is True
             return self.fit(x, label)
 
     def fit(self, x, label):
