@@ -1,3 +1,12 @@
+
+**2019.03.09更新**:
+
+- 更新至Python3.X
+- 更新至Pytorch 0.4+(移除Variable等)
+- 使用mask作 Piece Pooling
+- 相比FilterNYT,建议使用大版本数据集NYT
+
+
 2019.03.05:
 
 修复`mask piece wise`的bug.
