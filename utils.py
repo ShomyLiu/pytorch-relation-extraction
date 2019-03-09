@@ -10,12 +10,12 @@ def now():
 
 def save_pr(out_dir, name, epoch, pre, rec, fp_res=None, opt=None):
     if opt is None:
-        out = file('{}/{}_{}_PR.txt'.format(out_dir, name, epoch + 1), 'w')
+        out = open('{}/{}_{}_PR.txt'.format(out_dir, name, epoch + 1), 'w')
     else:
-        out = file('{}/{}_{}_{}_PR.txt'.format(out_dir, name, opt, epoch + 1), 'w')
+        out = open('{}/{}_{}_{}_PR.txt'.format(out_dir, name, opt, epoch + 1), 'w')
 
     if fp_res is not None:
-        fp_out = file('{}/{}_{}_FP.txt'.format(out_dir, name, epoch + 1), 'w')
+        fp_out = open('{}/{}_{}_FP.txt'.format(out_dir, name, epoch + 1), 'w')
         for idx, r, p in fp_res:
             fp_out.write('{} {} {}\n'.format(idx, r, p))
         fp_out.close()

@@ -9,7 +9,7 @@ import torch.nn.functional as F
 
 class PCNN_ONE(BasicModule):
     '''
-    Zeng 2015 DS PCNN: Distant Supervised Relation Extraction
+    Zeng 2015 DS PCNN
     '''
     def __init__(self, opt):
         super(PCNN_ONE, self).__init__()
@@ -31,6 +31,12 @@ class PCNN_ONE(BasicModule):
 
         if self.opt.use_pcnn:
             all_filter_num = all_filter_num * 3
+            masks = torch.FloatTensor(([[0, 0, 1], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
+            if self.opt.use_gpu:
+                masks = masks.cuda()
+            self.mask_embedding = nn.Embedding(4, 3)
+            self.mask_embedding.weight.data.copy_(masks)
+            self.mask_embedding.weight.requires_grad = False
 
         self.linear = nn.Linear(all_filter_num, self.opt.rel_num)
         self.dropout = nn.Dropout(self.opt.drop_out)
@@ -43,11 +49,11 @@ class PCNN_ONE(BasicModule):
         use xavier to init
         '''
         for conv in self.convs:
-            nn.init.xavier_uniform(conv.weight)
-            nn.init.constant(conv.bias, 0.0)
+            nn.init.xavier_uniform_(conv.weight)
+            nn.init.constant_(conv.bias, 0.0)
 
-        nn.init.xavier_uniform(self.linear.weight)
-        nn.init.constant(self.linear.bias, 0.0)
+        nn.init.xavier_uniform_(self.linear.weight)
+        nn.init.constant_(self.linear.bias, 0.0)
 
     def init_word_emb(self):
 
@@ -76,14 +82,12 @@ class PCNN_ONE(BasicModule):
         refer: https://github.com/thunlp/OpenNRE
         A fast piecewise pooling using mask
         '''
-        mask_embedding = torch.LongTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
-        if self.opt.use_gpu:
-            mask_embedding = mask_embedding.cuda()
-        x = x.unsqueeze(-1).permute(0, 2, 1, 3)
-        masks = mask_embedding[mask].unsqueeze(-2) * 100
+        x = x.unsqueeze(-1).permute(0, 2, 1, -1)
+        masks = self.mask_embedding(mask).unsqueeze(-2) * 100
         x = masks.float() + x
-        x = torch.max(x, 1)[0] - 100
-        return x.view(-1, x.size(1) * x.size(2))
+        x = torch.max(x, 1)[0] - torch.FloatTensor([100]).cuda()
+        x = x.view(-1, x.size(1) * x.size(2))
+        return x
 
     def piece_max_pooling(self, x, insPool):
         '''
@@ -105,7 +109,7 @@ class PCNN_ONE(BasicModule):
         assert out.size(1) == 3 * self.opt.filters_num
         return out
 
-    def forward(self, x):
+    def forward(self, x, train=False):
 
         insEnt, _, insX, insPFs, insPool, insMasks = x
         insPF1, insPF2 = [i.squeeze(1) for i in torch.split(insPFs, 1, 1)]
@@ -119,13 +123,11 @@ class PCNN_ONE(BasicModule):
         x = self.dropout(x)
 
         x = [conv(x).squeeze(3) for conv in self.convs]
-
         if self.opt.use_pcnn:
-            x = [self.mask_piece_pooling(i, insMasks) for i in x]
-            # x = [self.piece_max_pooling(i, insPool) for i in x]
+          #  x = [self.mask_piece_pooling(i, insMasks) for i in x]
+            x = [self.piece_max_pooling(i, insPool) for i in x]
         else:
             x = [F.max_pool1d(i, i.size(2)).squeeze(2) for i in x]
-
         x = torch.cat(x, 1).tanh()
         x = self.dropout(x)
         x = self.linear(x)

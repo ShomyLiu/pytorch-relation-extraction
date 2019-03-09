@@ -4,11 +4,11 @@ from config import opt
 import models
 import dataset
 import torch
+import numpy as np
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import torch.optim as optim
 import torch.nn.functional as F
-from torch.autograd import Variable
 from utils import save_pr, now, eval_metric
 
 
@@ -21,7 +21,16 @@ def test(**kwargs):
     pass
 
 
+def setup_seed(seed):
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    torch.backends.cudnn.deterministic = True
+
+
 def train(**kwargs):
+
+    setup_seed(opt.seed)
 
     kwargs.update({'model': 'PCNN_ONE'})
     opt.parse(kwargs)
@@ -47,8 +56,9 @@ def train(**kwargs):
     print('train data: {}; test data: {}'.format(len(train_data), len(test_data)))
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adadelta(model.parameters(), rho=1.0, eps=1e-6, weight_decay=opt.weight_decay)
-
+    optimizer = optim.Adadelta(filter(lambda p: p.requires_grad, model.parameters()), rho=1.0, eps=1e-6, weight_decay=opt.weight_decay)
+    # optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=opt.lr, betas=(0.9, 0.999), weight_decay=opt.weight_decay)
+    # optimizer = optim.Adadelta(model.parameters(), rho=1.0, eps=1e-6, weight_decay=opt.weight_decay)
     # train
     print("start training...")
     max_pre = -1.0
@@ -69,14 +79,14 @@ def train(**kwargs):
 
             optimizer.zero_grad()
 
-            out = model(data)
-            loss = criterion(out, Variable(label))
+            out = model(data, train=True)
+            loss = criterion(out, label)
             loss.backward()
             optimizer.step()
 
-            total_loss += loss.data[0]
+            total_loss += loss.item()
 
-        if epoch < 3:
+        if epoch < -1:
             continue
         true_y, pred_y, pred_p = predict(model, test_data_loader)
         all_pre, all_rec, fp_res = eval_metric(true_y, pred_y, pred_p)
@@ -110,9 +120,9 @@ def select_instance(model, batch_data, labels):
         if insNum > 1:
             model.batch_size = insNum
             if opt.use_gpu:
-                data = map(lambda x: Variable(torch.LongTensor(x).cuda()), bag)
+                data = map(lambda x: torch.LongTensor(x).cuda(), bag)
             else:
-                data = map(lambda x: Variable(torch.LongTensor(x)), bag)
+                data = map(lambda x: torch.LongTensor(x), bag)
 
             out = model(data)
 
@@ -120,7 +130,8 @@ def select_instance(model, batch_data, labels):
             max_ins_id = torch.max(out[:, label], 0)[1]
 
             if opt.use_gpu:
-                max_ins_id = max_ins_id.data.cpu().numpy()[0]
+                #  max_ins_id = max_ins_id.data.cpu().numpy()[0]
+                max_ins_id = max_ins_id.item()
             else:
                 max_ins_id = max_ins_id.data.numpy()[0]
 
@@ -137,9 +148,9 @@ def select_instance(model, batch_data, labels):
         select_mask.append(max_mask)
 
     if opt.use_gpu:
-        data = map(lambda x: Variable(torch.LongTensor(x).cuda()), [select_ent, select_num, select_sen, select_pf, select_pool, select_mask])
+        data = map(lambda x: torch.LongTensor(x).cuda(), [select_ent, select_num, select_sen, select_pf, select_pool, select_mask])
     else:
-        data = map(lambda x: Variable(torch.LongTensor(x)), [select_ent, select_num, select_sen, select_pf, select_pool, select_mask])
+        data = map(lambda x: torch.LongTensor(x), [select_ent, select_num, select_sen, select_pf, select_pool, select_mask])
 
     model.train()
     return data
@@ -158,13 +169,12 @@ def predict(model, test_data_loader):
             insNum = bag[1]
             model.batch_size = insNum
             if opt.use_gpu:
-                data = map(lambda x: Variable(torch.LongTensor(x).cuda()), bag)
+                data = map(lambda x: torch.LongTensor(x).cuda(), bag)
             else:
-                data = map(lambda x: Variable(torch.LongTensor(x)), bag)
+                data = map(lambda x: torch.LongTensor(x), bag)
 
             out = model(data)
             out = F.softmax(out, 1)
-
             max_ins_prob, max_ins_label = map(lambda x: x.data.cpu().numpy(), torch.max(out, 1))
             tmp_prob = -1.0
             tmp_NA_prob = -1.0

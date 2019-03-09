@@ -29,6 +29,12 @@ class PCNN_ATT(BasicModule):
 
         if self.opt.use_pcnn:
             rel_dim = all_filter_num * 3
+            masks = torch.LongTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
+            if self.opt.use_gpu:
+                masks = masks.cuda()
+            self.mask_embedding = nn.Embedding(4, 3)
+            self.mask_embedding.weight.data.copy_(masks)
+            self.mask_embedding.weight.requires_grad = False
 
         self.rel_embs = nn.Parameter(torch.randn(self.opt.rel_num, rel_dim))
         self.rel_bias = nn.Parameter(torch.randn(self.opt.rel_num))
@@ -93,13 +99,9 @@ class PCNN_ATT(BasicModule):
         refer: https://github.com/thunlp/OpenNRE
         A fast piecewise pooling using mask
         '''
-        mask_embedding = torch.LongTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
-        if self.opt.use_gpu:
-            mask_embedding = mask_embedding.cuda()
-
         x = x.unsqueeze(-1).permute(0, 2, 1, 3)
-        masks = mask_embedding[mask].unsqueeze(-2) * 100
-        x = masks .float() + x
+        masks = self.mask_embedding(mask).unsqueeze(-2) * 100
+        x = masks + x
         x = torch.max(x, 1)[0] - 100
         return x.view(-1, x.size(1) * x.size(2))
 
@@ -133,11 +135,11 @@ class PCNN_ATT(BasicModule):
 
         if label is None:
             # for test
-            assert self.training is False
+            assert self.training == False
             return self.test(x)
         else:
             # for train
-            assert self.training is True
+            assert self.training == True
             return self.fit(x, label)
 
     def fit(self, x, label):

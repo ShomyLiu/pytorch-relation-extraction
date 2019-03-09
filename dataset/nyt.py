@@ -17,7 +17,7 @@ class NYTData(Dataset):
 
         self.labels = np.load(path + 'labels.npy')
         self.x = np.load(path + 'bags_feature.npy')
-        self.x = zip(self.x, self.labels)
+        self.x = list(zip(self.x, self.labels))
 
         print('loading finish')
 
@@ -76,18 +76,17 @@ class NYTLoad(object):
         reading from vec.bin
         add two extra tokens:
             : UNK for unkown tokens
-            : BLANK for the max len sentence
         '''
         wordlist = []
 
-        f = file(self.w2v_path)
+        f = open(self.w2v_path)
         # dim = int(f.readline().split()[1])
         # f = f.readlines()
 
         vecs = []
         for line in f:
             line = line.strip('\n').split()
-            vec = map(float, line[1].split(',')[:-1])
+            vec = list(map(float, line[1].split(',')[:-1]))
             vecs.append(vec)
             wordlist.append(line[0])
 
@@ -104,7 +103,7 @@ class NYTLoad(object):
         '''
         all_sens =[]
         all_labels =[]
-        f = file(path)
+        f = open(path)
         while 1:
             line = f.readline()
             if not line:
@@ -131,7 +130,7 @@ class NYTLoad(object):
                 #  entities = ent_pair_line[:2]
                 # ignore the entities index in vocab
                 entities = [0, 0]
-                epos = map(lambda x: int(x), ent_pair_line[2:4])
+                epos = list(map(lambda x: int(x) + 1, ent_pair_line[2:4]))
                 pos.append(epos)
                 epos.sort()
                 entitiesPos.append(epos)
@@ -139,12 +138,12 @@ class NYTLoad(object):
                 rel = int(ent_pair_line[4])
                 rels.append(rel)
                 sent = f.readline().strip().split(',')
-                sentences.append(map(lambda x: int(x), sent))
+                sentences.append(list(map(lambda x: int(x), sent)))
                 ldist = f.readline().strip().split(',')
                 rdist = f.readline().strip().split(',')
                 mask = f.readline().strip().split(",")
-                ldists.append(map(int, ldist))
-                rdists.append(map(int, rdist))
+                ldists.append(list(map(int, ldist)))
+                rdists.append(list(map(int, rdist)))
                 masks.append(list(map(int, mask)))
 
             rels = list(set(rels))
@@ -309,8 +308,8 @@ class NYTLoad(object):
 
         pf1 = [0]
         pf2 = [0]
-        pf1 += map(padding, index - ent_pos[0] + 2 + self.limit)
-        pf2 += map(padding, index - ent_pos[1] + 2 + self.limit)
+        pf1 += list(map(padding, index - ent_pos[0] + 2 + self.limit))
+        pf2 += list(map(padding, index - ent_pos[1] + 2 + self.limit))
 
         if len(pf1) < self.max_len + 2 * self.pad:
             pf1 += [0] * (self.max_len + 2 * self.pad - len(pf1))

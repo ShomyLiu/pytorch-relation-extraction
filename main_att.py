@@ -6,7 +6,6 @@ import dataset
 import torch
 from torch.utils.data import DataLoader
 import torch.optim as optim
-from torch.autograd import Variable
 from utils import save_pr, now, eval_metric
 
 
@@ -60,12 +59,12 @@ def train(**kwargs):
             model.batch_size = opt.batch_size
             loss = model(data, label)
             if opt.use_gpu:
-                label = Variable(torch.LongTensor(label).cuda())
+                label = torch.LongTensor(label).cuda()
             else:
-                label = Variable(torch.LongTensor(label))
+                label = torch.LongTensor(label)
             loss.backward()
             optimizer.step()
-            total_loss += loss.data[0]
+            total_loss += loss.item()
 
             # if idx % 100 == 99:
                 # print('{}: Train iter: {} finish'.format(now(), idx))
