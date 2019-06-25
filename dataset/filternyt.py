@@ -88,7 +88,7 @@ class FilterNYTLoad(object):
 
         for line in open(self.w2v_path):
             line = line.strip('\n').split()
-            vec = map(float, line)
+            vec = list(map(float, line))
             vecs.append(vec)
 
         dim = len(vecs[0])
@@ -114,11 +114,11 @@ class FilterNYTLoad(object):
             line = f.readline()
             if not line:
                 break
-            entities = map(int, line.split(' '))
+            entities = list(map(int, line.split(' ')))
             line = f.readline()
             bagLabel = line.split(' ')
 
-            rel = map(int, bagLabel[0:-1])
+            rel = list(map(int, bagLabel[0:-1]))
             num = int(bagLabel[-1])
             positions = []
             sentences = []
@@ -126,14 +126,14 @@ class FilterNYTLoad(object):
             masks = []
             for i in range(0, num):
                 sent = f.readline().split(' ')
-                positions.append(map(int, sent[0:2]))
-                epos = map(lambda x: int(x) + 1, sent[0:2])
+                positions.append(list(map(int, sent[0:2])))
+                epos = list(map(lambda x: int(x) + 1, sent[0:2]))
                 epos.sort()
                 mask = [1] * (epos[0] + 1)
                 mask += [2] * (epos[1] - epos[0])
                 mask += [3] * (len(sent[2:-1]) - epos[1])
                 entitiesPos.append(epos)
-                sentences.append(map(int, sent[2:-1]))
+                sentences.append(list(map(int, sent[2:-1])))
                 masks.append(mask)
             bag = [entities, num, sentences, positions, entitiesPos, masks]
             all_labels.append(rel)
@@ -205,8 +205,8 @@ class FilterNYTLoad(object):
 
         pf1 = []
         pf2 = []
-        pf1 += map(padding, index - ent_pos[0] + 2 + self.limit)
-        pf2 += map(padding, index - ent_pos[1] + 2 + self.limit)
+        pf1 += list(map(padding, index - ent_pos[0] + 2 + self.limit))
+        pf2 += list(map(padding, index - ent_pos[1] + 2 + self.limit))
 
         if len(pf1) < self.max_len + 2 * self.pad:
             pf1 += [0] * (self.max_len + 2 * self.pad - len(pf1))
