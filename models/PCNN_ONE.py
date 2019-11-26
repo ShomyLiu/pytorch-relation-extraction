@@ -31,7 +31,7 @@ class PCNN_ONE(BasicModule):
 
         if self.opt.use_pcnn:
             all_filter_num = all_filter_num * 3
-            masks = torch.FloatTensor(([[0, 0, 1], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
+            masks = torch.FloatTensor(([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]))
             if self.opt.use_gpu:
                 masks = masks.cuda()
             self.mask_embedding = nn.Embedding(4, 3)
