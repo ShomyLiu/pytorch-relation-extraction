@@ -168,5 +168,12 @@ python main_mil.py train --data="NYT"  --batch_size=128
 ## 附
 使用此代码可以自愿选择引用：
 
->Liu H, Wang P, Wu F, et al. REET: Joint Relation Extraction and Entity Typing via Multi-task Learning[C]//CCF International Conference on Natural Language Processing and Chinese Computing. Springer, Cham, 2019: 327-339.
+>@inproceedings{liu2019reet,
+  title={REET: Joint Relation Extraction and Entity Typing via Multi-task Learning},
+  author={Liu, Hongtao and Wang, Peiyi and Wu, Fangzhao and Jiao, Pengfei and Wang, Wenjun and Xie, Xing and Sun, Yueheng},
+  booktitle={CCF International Conference on Natural Language Processing and Chinese Computing},
+  pages={327--339},
+  year={2019},
+  organization={Springer}
+}
 
