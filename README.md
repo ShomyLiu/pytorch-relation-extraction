@@ -164,3 +164,9 @@ python main_mil.py train --data="NYT"  --batch_size=128
 - [PCNN+ATT Lin 2016](https://github.com/thunlp/OpenNRE)
 - [RE-DS-Word-Attention-Models](https://github.com/SharmisthaJat/RE-DS-Word-Attention-Models)
 - [GloRE](https://github.com/ppuliu/GloRE)
+
+## 附
+使用此代码可以自愿选择引用：
+
+>Liu H, Wang P, Wu F, et al. REET: Joint Relation Extraction and Entity Typing via Multi-task Learning[C]//CCF International Conference on Natural Language Processing and Chinese Computing. Springer, Cham, 2019: 327-339.
+
