@@ -167,8 +167,8 @@ python main_mil.py train --data="NYT"  --batch_size=128
 
 ## 附
 使用此代码可以自愿选择引用：
-
->@inproceedings{liu2019reet,
+```
+@inproceedings{liu2019reet,
   title={REET: Joint Relation Extraction and Entity Typing via Multi-task Learning},
   author={Liu, Hongtao and Wang, Peiyi and Wu, Fangzhao and Jiao, Pengfei and Wang, Wenjun and Xie, Xing and Sun, Yueheng},
   booktitle={CCF International Conference on Natural Language Processing and Chinese Computing},
@@ -176,4 +176,4 @@ python main_mil.py train --data="NYT"  --batch_size=128
   year={2019},
   organization={Springer}
 }
-
+```
